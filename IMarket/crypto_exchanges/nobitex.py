@@ -1,5 +1,5 @@
 import requests
-from crypto_exchanges.base import IMarketDataFetcher
+from IMarket.crypto_exchanges.base import IMarketDataFetcher
 
 class Nobitex(IMarketDataFetcher):
     """Fetches market data from Nobitex API."""
@@ -8,13 +8,12 @@ class Nobitex(IMarketDataFetcher):
         """Initialize the data fetcher."""
         pass
 
-    def fetch(self, ticker):
-        self.fetch_raw_data(ticker)
+    def fetch(self):
+        self.fetch_raw_data()
 
-    def fetch_raw_data(self, ticker) -> dict:
+    def fetch_raw_data(self) -> dict:
         """Fetch raw data from Nobitex API for the specified ticker."""
-        try:
-            self.ticker = ticker        
+        try:       
             url = f"https://apiv2.nobitex.ir/v3/orderbook/{self.ticker}"
             response = requests.get(url, timeout=10)
             self.data = response.json()
@@ -27,20 +26,10 @@ class Nobitex(IMarketDataFetcher):
         except Exception as error:
             print(f"{error}")
         
-    def get_orderbook(self, asksorbids, row):
-        return self.data[asksorbids][row]
-    
-    @property
-    def status(self):
-        self.data['status']
-
-    @property
-    def last_update(self):
-        self.data['lastUpdate']
-
-    @property
-    def last_trade_price(self):
-        self.data['lastTradePrice']
+    def get_orderbook(self, asksorbids, row) -> list:
+        lst = [float(n) for n in self.data[asksorbids][row]]
+        return {"price": lst[0],
+                "amount": lst[1]}
         
     @property
     def ticker(self) -> str:

@@ -2,8 +2,12 @@
 .tbvenv
 
 # cache
+
+__pycache__/
 IMarket/__pycache__
 IMarket/crypto_exchanges/__pycache__
+IExchange/__pycache__
 
 # config
 IMarket/crypto_exchanges/exchanges_config.json
+

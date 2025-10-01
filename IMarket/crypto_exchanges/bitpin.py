@@ -1,5 +1,5 @@
 import requests
-from crypto_exchanges.base import IMarketDataFetcher
+from IMarket.crypto_exchanges.base import IMarketDataFetcher
 
 
 class Bitpin(IMarketDataFetcher):
