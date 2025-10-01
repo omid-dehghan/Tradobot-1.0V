@@ -1,0 +1,9 @@
+# Virtual enviroment
+.tbvenv
+
+# cache
+IMarket/__pycache__
+IMarket/crypto_exchanges/__pycache__
+
+# config
+IMarket/crypto_exchanges/exchanges_config.json
