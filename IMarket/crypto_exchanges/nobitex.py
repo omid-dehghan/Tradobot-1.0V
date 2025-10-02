@@ -1,12 +1,13 @@
 import requests
 from IMarket.crypto_exchanges.base import IMarketDataFetcher
+from announcer import Announcer
 
 class Nobitex(IMarketDataFetcher):
     """Fetches market data from Nobitex API."""
 
-    def __init__(self) -> None:
+    def __init__(self, announcer: Announcer) -> None:
         """Initialize the data fetcher."""
-        pass
+        self.announcer = announcer
 
     def fetch(self):
         self.fetch_raw_data()
@@ -15,16 +16,19 @@ class Nobitex(IMarketDataFetcher):
         """Fetch raw data from Nobitex API for the specified ticker."""
         try:       
             url = f"https://apiv2.nobitex.ir/v3/orderbook/{self.ticker}"
-            response = requests.get(url, timeout=10)
-            self.data = response.json()
+            response = requests.get(url, timeout=7)
+            self.announcer.log(f"[Nobitex] {self.ticker} request...")
+            if response.status_code == 200:
+                self.announcer.log(f"[Nobitex] {self.ticker} ok...")
+                self.data = response.json()
         except requests.exceptions.Timeout:
-            print(f"{self.ticker} data request timeout...")
+            self.announcer.error(f"{self.ticker} data request timeout...")
         except requests.exceptions.ConnectionError:
-            print(f"{self.ticker} data request: Connection error. check your network...")
+            self.announcer.error(f"{self.ticker} data request: Connection error. check your network...")
         except requests.exceptions.HTTPError as httperror:
-            print(f"{self.ticker} data request: Http Error.{httperror}")
+            self.announcer.error(f"{self.ticker} data request: Http Error.{httperror}")
         except Exception as error:
-            print(f"{error}")
+            self.announcer.error(f"{error}")
         
     def get_orderbook(self, asksorbids, row) -> list:
         lst = [float(n) for n in self.data[asksorbids][row]]
@@ -34,10 +38,10 @@ class Nobitex(IMarketDataFetcher):
     @property
     def ticker(self) -> str:
         """Get the ticker symbol."""
-        try:
+        if self.__ticker:
             return self.__ticker
-        except AttributeError:
-            ("Ticker must be set before fetching data.")
+        else:
+            raise ValueError("Ticker must be set before fetching data.")
 
     @ticker.setter
     def ticker(self, ticker: str) -> None:
@@ -57,11 +61,13 @@ class Nobitex(IMarketDataFetcher):
         try:
             return self.__data
         except AttributeError:
-            raise AttributeError("Data has not been fetched yet.")
+            self.announcer.error("Data has not been fetched yet.")
 
     @data.setter
     def data(self, data: dict) -> None:
         """Set the fetched data."""
-        if not isinstance(data, dict):
-            raise ValueError("Data must be a dictionary.")
-        self.__data = data
+        if isinstance(data, dict):
+            self.__data = data
+        else:
+            self.announcer.error("data should be a dictionary.")
+            

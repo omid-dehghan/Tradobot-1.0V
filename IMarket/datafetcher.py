@@ -4,9 +4,9 @@ from IMarket.crypto_exchanges.base import IMarketDataFetcher
 
 class FetchData:
 
-    def __init__(self, ex:IMarketDataFetcher = None):
+    def __init__(self, announcer, ex:IMarketDataFetcher = None):
         if ex is None:
-            ex = Nobitex() 
+            ex = Nobitex(announcer) 
         self.ex = ex
 
     def fetch(self):
@@ -28,14 +28,6 @@ class FetchData:
         return self.data['lastTradePrice']
 
     @property
-    def ticker(self) -> dict:
-        """ticker setter"""
-        try:
-            return self.ex.ticker
-        except AttributeError:
-            raise AttributeError("set the ticker.")
-        
-    @property
     def data(self) -> dict:
         """Get the fetched data."""
         try:
@@ -43,6 +35,14 @@ class FetchData:
         except AttributeError:
             raise AttributeError("Data has not been fetched yet.")
 
+    @property
+    def ticker(self) -> dict:
+        """ticker setter"""
+        try:
+            return self.ex.ticker
+        except AttributeError:
+            raise AttributeError("set the ticker.")
+        
     @ticker.setter
     def ticker(self, ticker) -> dict:
         """ticker setter"""

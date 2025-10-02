@@ -11,3 +11,5 @@ IExchange/__pycache__
 # config
 IMarket/crypto_exchanges/exchanges_config.json
 
+# logs
+logs.csv

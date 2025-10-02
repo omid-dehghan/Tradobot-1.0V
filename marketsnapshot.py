@@ -1,5 +1,6 @@
 from IMarket.datafetcher import FetchData
-from IExchange.exchange import Exchange
+from IExchange.exchangeprofile import ExProfile
+from announcer import Announcer
 
 class MarketSnapshot:
     """Calculations"""
@@ -8,13 +9,13 @@ class MarketSnapshot:
     
 #========================================== Constructor ========================================== 
 
-    def __init__(self, base=None, quote=None, constant=None) -> None:
+    def __init__(self, announcer:Announcer, base=None, quote=None, constant=None) -> None:
         """gets 2 ticker data and check if trade profitable or not"""
         self.setBase(base)
         self.setQuote(quote)
         self.setConstant(constant)
-        self.setBaseObj(FetchData())
-        self.setQuoteObj(FetchData())
+        self.setBaseObj(FetchData(announcer))
+        self.setQuoteObj(FetchData(announcer))
                  
 #========================================== Object Methods ==========================================      
 
@@ -23,7 +24,6 @@ class MarketSnapshot:
         self.getQuoteObj().ticker = f"{self.getQuote()}{self.getConstant()}"
         self.getBaseObj().fetch()
         self.getQuoteObj().fetch()
-        self.setExtractedDatas()
         self.sets()
         self.setTradeInfo()      
     
@@ -70,13 +70,13 @@ class MarketSnapshot:
         self.__setMMb2q_buyprice(self.getExtractedDatas()[self.getQuote()]["bids"]["price"])
         diff = self.getPriceGap(self.MMb2q_sellprice, self.MMb2q_buyprice)
         diff_percent = self.getPriceGapPercentage(diff, self.MMb2q_buyprice)
-        self.__setMMb2q_profitloss(round(diff_percent - Exchange.Maker_fee(self.getConstant()) - Exchange.Maker_fee(self.getConstant()), 2))
+        self.__setMMb2q_profitloss(round(diff_percent - (2 * ExProfile.Maker_fee(self.getConstant())), 2))
         # ------------- Maker Maker Quote to Base:
         self.__setMMq2b_sellprice(self.getExtractedDatas()[self.getQuote()]["asks"]["price"])
         self.__setMMq2b_buyprice(self.getExtractedDatas()[self.getBase()]["bids"]["price"]) 
         diff = self.getPriceGap(self.MMq2b_sellprice, self.MMq2b_buyprice)
         diff_percent = self.getPriceGapPercentage(diff, self.MMq2b_sellprice)
-        self.__setMMq2b_profitloss(round(diff_percent - Exchange.Maker_fee(self.getConstant()) - Exchange.Maker_fee(self.getConstant()), 2))
+        self.__setMMq2b_profitloss(round(diff_percent - (2 * ExProfile.Maker_fee(self.getConstant())), 2))
 
     def __setMMb2q_buyprice(self, price) -> float:
         self.__MMb2q_buyprice = price

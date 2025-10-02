@@ -1,4 +1,4 @@
-class Exchange:
+class ExProfile:
     __token = "499ee0727191e2e25253ab66bc8b79c32cd02419"
     __headers = {"Authorization": f"Token {__token}",
                  "Content-Type": "application/json"}
