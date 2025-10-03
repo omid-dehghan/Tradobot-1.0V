@@ -11,11 +11,13 @@ class MarketSnapshot:
 
     def __init__(self, announcer:Announcer, base=None, quote=None, constant=None) -> None:
         """gets 2 ticker data and check if trade profitable or not"""
+        self.announcer = announcer
         self.setBase(base)
         self.setQuote(quote)
         self.setConstant(constant)
         self.setBaseObj(FetchData(announcer))
         self.setQuoteObj(FetchData(announcer))
+        
                  
 #========================================== Object Methods ==========================================      
 
@@ -24,33 +26,21 @@ class MarketSnapshot:
         self.getQuoteObj().ticker = f"{self.getQuote()}{self.getConstant()}"
         self.getBaseObj().fetch()
         self.getQuoteObj().fetch()
-        self.sets()
-        self.setTradeInfo()      
+        self.sets() 
+        self.announcer.mms_position_announce(self.getBase(), self.getQuote(), self.MMb2q_sellprice, self.MMb2q_buyprice, self.MMb2q_profitloss, self.MMq2b_sellprice, self.MMq2b_buyprice, self.MMq2b_profitloss) 
     
     def sets(self) -> None:
+        self.setExtractedDatas()
         self.__setMakerMakerStrategyPL()
-       
-    def getPriceGap(self, num1, num2):
-        return num1 - num2
-    def getPriceGapPercentage(self, num1, num2):
-        return (num1 / num2) * 100
+        
 #========================================== Setters ========================================== 
-    
-    def setTradeInfo(self) -> None:
-        self.__tradeInfo = {
-            # "date": self.getBaseObj().getLastUpdate()["date"],
-            # "time": self.getBaseObj().getLastUpdate()["time"],
-            "MMB2Q": self.MMb2q_profitloss,
-            "MMQ2B": self.MMq2b_profitloss
-        }
 
-    def setExtractedDatas(self) -> None:
-        """Return The first order of 2 pairs"""
+    def setExtractedDatas(self) -> dict:
+        """Return The first order of 2 pairs: price and amount"""
         datas = {self.getBase(): {"asks":self.getBaseObj().get_orderbook("asks", 0),
                          "bids":self.getBaseObj().get_orderbook("bids", 0)},
                  self.getQuote(): {"asks":self.getQuoteObj().get_orderbook("asks", 0),
                          "bids":self.getQuoteObj().get_orderbook("bids", 0)}}
-        
         self.__datas = datas
 
     def setBase(self, base) -> None:
@@ -105,8 +95,6 @@ class MarketSnapshot:
         return self.__BaseData
     def getQuoteObj(self) -> FetchData:
         return self.__QuoteData    
-    def getTradeInfo(self) -> dict:
-        return self.__tradeInfo
     
     @property
     def MMb2q_buyprice(self) -> float:
@@ -127,4 +115,7 @@ class MarketSnapshot:
     def MMq2b_profitloss(self) -> float:
         return self.__MMq2b_profitloss
     
-    
+    def getPriceGap(self, num1, num2):
+        return num1 - num2
+    def getPriceGapPercentage(self, num1, num2):
+        return (num1 / num2) * 100

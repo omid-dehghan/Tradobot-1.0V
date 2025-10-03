@@ -13,3 +13,7 @@ IMarket/crypto_exchanges/exchanges_config.json
 
 # logs
 logs.csv
+trades.csv
+
+# data
+snapshots.csv

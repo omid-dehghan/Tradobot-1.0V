@@ -6,7 +6,7 @@ from announcer import Announcer
 import time
 
 if __name__ == "__main__":
-    announcer = Announcer(printing=True, save_to_file=False)
+    announcer = Announcer(info_print=True, log_print=False,  error_print=False, save_logs=True, save_trades=True, save_snapshots=True)
     app = MarketSnapshot(announcer, "PAXG", "XAUT", "USDT")
     while True:
         try:

@@ -19,6 +19,6 @@ class ExProfile:
     
     def Maker_fee(constant) -> float:
         if constant == "USDT":
-            return 0.095
+            return 0.1
         if constant == "IRT":
             return 0.17
